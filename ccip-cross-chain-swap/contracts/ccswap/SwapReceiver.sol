@@ -15,7 +15,7 @@ contract SwapReceiver is CCIPReceiver {
         swapRouter = _swapRouter;
     }
 
-    function performSwap(
+    function _performSwap(
         address tokenIn,
         address tokenOut,
         uint24 fee,

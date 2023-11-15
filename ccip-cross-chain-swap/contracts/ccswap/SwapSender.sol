@@ -4,7 +4,7 @@ pragma solidity 0.8.20;
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
-import {Withdraw} from "./utils/Withdraw.sol";
+import {Withdraw} from "../utils/Withdraw.sol";
 
 contract SwapSender is Withdraw {
     enum PayFeesIn {
@@ -36,14 +36,13 @@ contract SwapSender is Withdraw {
         uint256 amountOutMinimum,
         uint160 sqrtPriceLimitX96
     ) external {
-
         bytes memory data = abi.encodeWithSignature(
-            "performSwap(address,address,uint24,address,uint256,uint256,uint256,uint160)",
+            "_performSwap(address,address,uint24,address,uint256,uint256,uint256,uint160)",
             tokenIn,
             tokenOut,
             uniswapFee,
-            receiver, // recipient in `performSwap` 
-            amountIn, 
+            receiver, // recipient in `performSwap`
+            amountIn,
             amountOutMinimum,
             sqrtPriceLimitX96
         );
@@ -52,7 +51,9 @@ contract SwapSender is Withdraw {
             receiver: abi.encode(receiver),
             data: data,
             tokenAmounts: new Client.EVMTokenAmount[](0),
-            extraArgs: "",
+            extraArgs: Client._argsToBytes(
+                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+            ),
             feeToken: payFeesIn == PayFeesIn.LINK ? i_link : address(0)
         });
 
